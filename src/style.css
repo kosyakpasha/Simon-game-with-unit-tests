@@ -1,0 +1,39 @@
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 200px auto 100px;
+    list-style: none;
+    padding: 0;
+    height: 100px;
+    width: 400px;
+}
+
+.item {
+    width: 200px;
+    opacity: .4;
+}
+
+.blue {
+    background: blue;
+}
+
+.yellow {
+    background: yellow;
+}
+
+.red {
+    background: red;
+}
+
+.green {
+    background: green;
+}
+
+.active {
+    opacity: 1;
+}
+
+.start {
+    display: block;
+    margin: auto;
+}

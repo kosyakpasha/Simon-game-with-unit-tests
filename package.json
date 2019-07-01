@@ -1,0 +1,28 @@
+{
+  "name": "simon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "watch": {
+    "test": "{src,test}/*.ts"
+  },
+  "scripts": {
+    "start": "tsc src/*",
+    "watch": "ts-watch src/app.ts --outDir ./dist",
+    "test": "npx jest --watchAll"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/node": "^12.0.8",
+    "typescript": "^3.5.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "ts-watch": "^1.0.8"
+  }
+}
