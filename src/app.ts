@@ -1,7 +1,7 @@
 export class Round {
     private defaultColors: string[] = ['blue', 'yellow', 'red', 'green'];
     public generatedColors: string[] = [];
-    public numClick: number = 0;
+    public numStep: number = 0;
 
     constructor(previousColors: string[]) {
         this.generatedColors = [...previousColors, this.defaultColors[randomize(0, 3)]];
@@ -11,12 +11,14 @@ export class Round {
         return new Round(previous.generatedColors);
     }
 
-    public makeStep(step: Step, numStep: number, isLast?: boolean): Result {
-        if (this.generatedColors[numStep - 1] === step.color && isLast === true) {
+    public makeStep(step: Step): Result {
+        this.numStep++;
+
+        if (this.generatedColors[this.numStep - 1] === step.color && this.numStep  >= this.generatedColors.length) {
             return new Result('win');
-        } else if (this.generatedColors[numStep - 1] === step.color) {
+        } else if (this.generatedColors[this.numStep - 1] === step.color) {
             return new Result('next');
-        } else if (this.generatedColors[numStep - 1] !== step.color) {
+        } else if (this.generatedColors[this.numStep - 1] !== step.color) {
             return new Result('loose');
         }
     }
@@ -40,8 +42,8 @@ export class Step {
 
 export class Game {
     private powerOn: boolean = false;
-    private roundNum: number = 0;
     private round: Round;
+    public clickResult: Result;
 
     constructor(private amountOfRounds: number) {
         this.init();
@@ -54,44 +56,27 @@ export class Game {
     private init() {
         const firstRound = new Round([]);
 
-        this.roundNum++;
         this.clickHandler(firstRound);
     }
 
-    public clickHandler(firstRound?: Round) {
-        //add event listener should be here
-        if (firstRound) {
-            this.makeStepHandler(firstRound, 'blue', 1);
-
-            return this.round = this.nextRound(firstRound);
-        }
-
-        if (this.round.numClick === this.roundNum) {
-            return this.round = Round.fromPrevious(firstRound);
-        }
+    private clickHandler(firstRound: Round) {
+        this.click(new Step('green'), firstRound);
     }
 
-    public nextRound(round) {
-        if (round.numClick === this.roundNum) {
-            return Round.fromPrevious(round);
+    public click(step, firstRound?: Round) {
+        if (firstRound && isEquivalent(firstRound.makeStep(step), {result: 'win'}) && this.amountOfRounds === 1) {
+            this.clickResult = new Result('win');
+        } else if (isEquivalent(firstRound.makeStep(step), {result: 'win'}) && this.amountOfRounds > 1) {
+            this.round = Round.fromPrevious(firstRound);
+
+            console.log('2');
+        } else if (this.amountOfRounds > 1 && isEquivalent(this.round.makeStep(step), {result: 'next'})) {
+            this.round.makeStep(new Step('green'));
+        } else if (this.amountOfRounds > 1 && isEquivalent(this.round.makeStep(step), {result: 'loose'})) {
+            console.log('loose');
         }
-    }
 
-    public makeStepHandler(round: Round, color: string, numStep: number) {
-        round.numClick++;
-
-        if (round.numClick >= this.amountOfRounds &&
-          isEquivalent(round.makeStep(new Step(color), numStep, true), new Result('win'))) {
-            this.showResult('You win =)');
-
-            return 'You win =)';
-        } else if (isEquivalent(round.makeStep(new Step(color), numStep), new Result('loose'))) {
-            this.showResult('Game over =(');
-
-            return 'Game over =(';
-        } else if (isEquivalent(round.makeStep(new Step(color), numStep), new Result('next'))) {
-            return round.makeStep(new Step(color), numStep);
-        }
+        return this.clickResult;
     }
 
     private showResult(text: string) {
@@ -122,7 +107,7 @@ function isEquivalent(a, b) {
     return true;
 }
 
-const game = new Game(10);
+//const game = new Game(10);
 //
 // game.switchPower();
 

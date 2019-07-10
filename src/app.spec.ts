@@ -14,23 +14,25 @@ describe('Round', () => {
   });
 
   test('Is this winning step', () => {
-    const round = new Round(['green']);
+    const round = new Round(['green', 'blue']);
 
-    expect(round.makeStep(new Step('green'), 2, true)).toEqual({result: 'win'});
-  })
+    round.makeStep(new Step('green'));
+    round.makeStep(new Step('blue'));
+    expect(round.makeStep(new Step('green'))).toEqual({result: 'win'});
+  });
 
   test('Is this losing step', () => {
-    const round = new Round(['green']);
+    const round = new Round([]);
 
-    expect(round.makeStep(new Step('yellow'), 2)).toEqual({result: 'loose'});
-  })
+    expect(round.makeStep(new Step('yellow'))).toEqual({result: 'loose'});
+  });
 
   test('Is this step correct', () => {
     const round = new Round(['green']);
 
-    expect(round.makeStep(new Step('green'), 2)).toEqual({result: 'next'});
+    expect(round.makeStep(new Step('green'))).toEqual({result: 'next'});
   })
-})
+});
 
 describe('Step', () => {
   test('Step knows its value', () => {
@@ -38,7 +40,7 @@ describe('Step', () => {
 
     expect(step.value()).toEqual({color: 'green'});
   })
-})
+});
 
 describe('Result', () => {
   test('Result knows its value', () => {
@@ -46,81 +48,25 @@ describe('Result', () => {
 
     expect(result.value()).toEqual({result: 'correct'});
   })
-})
+});
 
 describe('Game', () => {
   test('Is game on', () => {
     const game = new Game(10);
 
     expect(game.switchPower()).toBeTruthy();
-  })
+  });
 
-  test('We lost game with one round', () => {
+  test('One round, one correct step - it is a "win"', () => {
     const game = new Game(1);
-    const firstRound = new Round([]);
-    firstRound.generatedColors[0] = 'green';
 
-    expect(game.makeStepHandler(firstRound, 'blue', 1)).toEqual('Game over =(');
-  })
+    expect(game.clickResult).toEqual({result: 'win'});
+  });
 
-  test('We win game with one round', () => {
-    const game = new Game(1);
-    const firstRound = new Round([]);
-    firstRound.generatedColors[0] = 'blue';
-
-    expect(game.makeStepHandler(firstRound, 'blue', 1)).toEqual('You win =)');
-  })
-
-  test('We need next step with two rounds', () => {
+  test('Two rounds, two correct steps - it is a "next"', () => {
     const game = new Game(2);
-    const firstRound = new Round([]);
-    firstRound.generatedColors[0] = 'blue';
 
-    expect(game.makeStepHandler(firstRound, 'blue', 1)).toEqual({result: 'next'});
-  })
-
-  test('We loose game with one round', () => {
-    const game = new Game(2);
-    const firstRound = new Round([]);
-    const round = Round.fromPrevious(firstRound);
-
-    firstRound.generatedColors[0] = 'blue';
-    round.generatedColors[1] = 'green';
-
-    game.makeStepHandler(firstRound, 'blue', 1);
-    game.makeStepHandler(round, 'blue', 1)
-
-    expect(game.makeStepHandler(round, 'yellow', 2)).toEqual('Game over =(');
-  })
-
-  test('We win game with one round', () => {
-    const game = new Game(2);
-    const firstRound = new Round([]);
-    const round = Round.fromPrevious(firstRound);
-
-    firstRound.generatedColors[0] = 'blue';
-    round.generatedColors[1] = 'green';
-
-    game.makeStepHandler(firstRound, 'blue', 1);
-    game.makeStepHandler(round, 'blue', 1)
-
-    expect(game.makeStepHandler(round, 'green', 2)).toEqual('You win =)');
-  })
-
-  test('We need next step with two rounds', () => {
-    const game = new Game(3);
-    const firstRound = new Round([]);
-    const round = Round.fromPrevious(firstRound);
-
-    firstRound.generatedColors[0] = 'blue';
-    round.generatedColors[1] = 'green';
-
-    game.makeStepHandler(firstRound, 'blue', 1);
-    game.makeStepHandler(round, 'blue', 1)
-
-    expect(game.makeStepHandler(round, 'green', 2)).toEqual({result: 'next'});
-  })
-})
-
-
-
+    game.click('green');
+    // expect(game.clickHandler(new Step('green'))).toEqual({result: 'next'});
+  });
+});
