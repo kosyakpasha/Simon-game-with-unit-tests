@@ -1,83 +1,95 @@
 export class Round {
     private defaultColors: string[] = ['blue', 'yellow', 'red', 'green'];
-    public generatedColors: string[] = [];
+    public colors: string[] = [];
     public numStep: number = 0;
 
     constructor(previousColors: string[]) {
-        this.generatedColors = [...previousColors, this.defaultColors[randomize(0, 3)]];
+        this.colors = [...previousColors, this.defaultColors[randomize(0, 3)]];
     }
 
     public static fromPrevious(previous: Round): Round {
-        return new Round(previous.generatedColors);
+        return new Round(previous.colors);
     }
 
     public makeStep(step: Step): Result {
         this.numStep++;
 
-        if (this.generatedColors[this.numStep - 1] === step.color && this.numStep  >= this.generatedColors.length) {
-            return new Result('win');
-        } else if (this.generatedColors[this.numStep - 1] === step.color) {
-            return new Result('next');
-        } else if (this.generatedColors[this.numStep - 1] !== step.color) {
+        if (this.colors[this.numStep - 1] !== step.value()) {
             return new Result('loose');
         }
+
+        if (this.numStep  >= this.colors.length) {
+            return new Result('win');
+        } 
+        
+        return new Result('next');
     }
 }
 
 export class Result {
-    constructor(public result: string) {}
+    constructor(private result: string) {}
 
-    public value(): Result {
-        return new Result(this.result);
+    public value() {
+        return this.result;
     }
 }
 
 export class Step {
-    constructor(public color: string) {}
+    constructor(private color: string) {}
 
-    public value(): Step {
-        return new Step(this.color);
+    public value() {
+        return this.color;
     }
 }
 
 export class Game {
-    private powerOn: boolean = false;
     private round: Round;
+    private amountOfRound: number;
+    private numOfRound: number;
     public clickResult: Result;
 
-    constructor(private amountOfRounds: number) {
-        this.init();
+    constructor() {
+        this.numOfRound = 0;
+        this.amountOfRound = 10;
     }
 
-    public switchPower() {
-        return this.powerOn = !this.powerOn;
-    }
-
-    private init() {
-        const firstRound = new Round([]);
-
-        this.clickHandler(firstRound);
-    }
-
-    private clickHandler(firstRound: Round) {
-        this.click(new Step('green'), firstRound);
-    }
-
-    public click(step, firstRound?: Round) {
-        if (firstRound && isEquivalent(firstRound.makeStep(step), {result: 'win'}) && this.amountOfRounds === 1) {
-            this.clickResult = new Result('win');
-        } else if (isEquivalent(firstRound.makeStep(step), {result: 'win'}) && this.amountOfRounds > 1) {
-            this.round = Round.fromPrevious(firstRound);
-
-            console.log('2');
-        } else if (this.amountOfRounds > 1 && isEquivalent(this.round.makeStep(step), {result: 'next'})) {
-            this.round.makeStep(new Step('green'));
-        } else if (this.amountOfRounds > 1 && isEquivalent(this.round.makeStep(step), {result: 'loose'})) {
-            console.log('loose');
+    public takeStep(step: Step) {
+        if (!this.round) {
+            this.numOfRound++;
+            this.round = new Round([]);
+        } else if (this.round.numStep === this.amountOfRound) {
+            this.numOfRound++;
+            this.round = Round.fromPrevious(this.round);
         }
 
-        return this.clickResult;
+        return this.round.makeStep(step);
     }
+
+    // private init() {
+    //     const firstRound = new Round([]);
+
+    //     this.clickHandler(firstRound);
+    // }
+
+    // private clickHandler(firstRound: Round) {
+    //     this.click(new Step('green'), firstRound);
+    // }
+
+    // public click(step, firstRound?: Round) {
+    //     if (firstRound && isEquivalent(firstRound.makeStep(step), {result: 'win'}) && this.amountOfRound === 1) {
+    //         this.clickResult = new Result('win');
+    //     } else if (isEquivalent(firstRound.makeStep(step), {result: 'win'}) && this.amountOfRound > 1) {
+    //         this.round = Round.fromPrevious(firstRound);
+
+    //         console.log('2');
+    //     } else if (this.amountOfRound > 1 && isEquivalent(this.round.makeStep(step), {result: 'next'})) {
+    //         this.round.makeStep(new Step('green'));
+    //     } else if (this.amountOfRound > 1 && isEquivalent(this.round.makeStep(step), {result: 'loose'})) {
+    //         console.log('loose');
+    //     }
+
+    //     return this.clickResult;
+    // }
 }
 
 function randomize(max, min) {

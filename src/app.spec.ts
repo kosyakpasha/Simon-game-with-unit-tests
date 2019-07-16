@@ -2,15 +2,15 @@ import { Round, Step, Result, Game } from './app';
 
 describe('Round', () => {
   test('first round created with one color', () => {
-    expect(new Round([]).generatedColors).toHaveLength(1);
+    expect(new Round([]).colors).toHaveLength(1);
   });
 
   test('next round can be created from the previous one', () => {
     const first = new Round([]);
     const second = Round.fromPrevious(first);
 
-    expect(second.generatedColors).toHaveLength(2);
-    expect(second.generatedColors[0]).toBe(first.generatedColors[0]);
+    expect(second.colors).toHaveLength(2);
+    expect(second.colors[0]).toBe(first.colors[0]);
   });
 
   test('Is this winning step', () => {
@@ -38,7 +38,7 @@ describe('Step', () => {
   test('Step knows its value', () => {
     const step = new Step('green');
 
-    expect(step.value()).toEqual({color: 'green'});
+    expect(step.value()).toEqual('green');
   })
 });
 
@@ -46,27 +46,37 @@ describe('Result', () => {
   test('Result knows its value', () => {
     const result = new Result('correct');
 
-    expect(result.value()).toEqual({result: 'correct'});
+    expect(result.value()).toEqual('correct');
   })
 });
 
 describe('Game', () => {
-  test('Is game on', () => {
-    const game = new Game(10);
+  test('Take one correct step', () => {
+    const game = new Game();
 
-    expect(game.switchPower()).toBeTruthy();
+    expect(game.takeStep(new Step('green'))).toEqual({result: 'win'});
   });
 
-  test('One round, one correct step - it is a "win"', () => {
-    const game = new Game(1);
+  test('Take one correct step', () => {
+    const game = new Game();
 
-    expect(game.clickResult).toEqual({result: 'win'});
+    expect(game.takeStep(new Step('green'))).toEqual({result: 'win'});
   });
 
-  test('Two rounds, two correct steps - it is a "next"', () => {
-    const game = new Game(2);
+  // test('One round, one correct step - it is a "win"', () => {
+  //   const game = new Game();
 
-    game.click('green');
-    // expect(game.clickHandler(new Step('green'))).toEqual({result: 'next'});
-  });
+  //   expect(game.clickResult).toEqual({result: 'win'});
+  // });
+
+  // test('Two rounds, two correct steps - it is a "next"', () => {
+  //   const game = new Game();
+
+  //   game.click('green');
+  //   // expect(game.clickHandler(new Step('green'))).toEqual({result: 'next'});
+  // });
+
+  // test('test test', () => {
+  //   expect(new Round([]).colors).toHaveLength(1);
+  // });
 });
