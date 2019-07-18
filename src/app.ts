@@ -18,10 +18,10 @@ export class Round {
             return new Result('loose');
         }
 
-        if (this.numStep  >= this.colors.length) {
+        if (this.numStep >= this.colors.length) {
             return new Result('win');
-        } 
-        
+        }
+
         return new Result('next');
     }
 }
@@ -46,71 +46,35 @@ export class Game {
     private round: Round;
     private amountOfRound: number;
     private numOfRound: number;
-    public clickResult: Result;
+    private currentResult: Result;
 
     constructor() {
-        this.numOfRound = 0;
+        this.numOfRound = 1;
         this.amountOfRound = 10;
+
+        this.round = new Round([]);
     }
 
-    public takeStep(step: Step) {
-        if (!this.round) {
-            this.numOfRound++;
-            this.round = new Round([]);
-        } else if (this.round.numStep === this.amountOfRound) {
+    public giveStep(step: Step) {
+        this.currentResult = this.round.makeStep(step);
+
+        if (this.currentResult.value() === 'win') {
             this.numOfRound++;
             this.round = Round.fromPrevious(this.round);
         }
 
-        return this.round.makeStep(step);
+        return this.currentResult.value();
     }
 
-    // private init() {
-    //     const firstRound = new Round([]);
-
-    //     this.clickHandler(firstRound);
-    // }
-
-    // private clickHandler(firstRound: Round) {
-    //     this.click(new Step('green'), firstRound);
-    // }
-
-    // public click(step, firstRound?: Round) {
-    //     if (firstRound && isEquivalent(firstRound.makeStep(step), {result: 'win'}) && this.amountOfRound === 1) {
-    //         this.clickResult = new Result('win');
-    //     } else if (isEquivalent(firstRound.makeStep(step), {result: 'win'}) && this.amountOfRound > 1) {
-    //         this.round = Round.fromPrevious(firstRound);
-
-    //         console.log('2');
-    //     } else if (this.amountOfRound > 1 && isEquivalent(this.round.makeStep(step), {result: 'next'})) {
-    //         this.round.makeStep(new Step('green'));
-    //     } else if (this.amountOfRound > 1 && isEquivalent(this.round.makeStep(step), {result: 'loose'})) {
-    //         console.log('loose');
-    //     }
-
-    //     return this.clickResult;
-    // }
+    public takeColor() {
+        if (this.currentResult.value() === 'loose') {
+            return null;
+        } else {
+            return this.round.colors[this.numOfRound - 1];
+        }
+    }
 }
 
 function randomize(max, min) {
     return Math.floor(Math.random() * max) + min;
-}
-
-function isEquivalent(a, b) {
-    const aProps = Object.getOwnPropertyNames(a);
-    const bProps = Object.getOwnPropertyNames(b);
-
-    if (aProps.length != bProps.length) {
-        return false;
-    }
-
-    for (var i = 0; i < aProps.length; i++) {
-        const propName = aProps[i];
-
-        if (a[propName] !== b[propName]) {
-            return false;
-        }
-    }
-
-    return true;
 }

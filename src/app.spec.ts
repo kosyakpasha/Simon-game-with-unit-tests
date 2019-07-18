@@ -51,32 +51,38 @@ describe('Result', () => {
 });
 
 describe('Game', () => {
-  test('Take one correct step', () => {
+  test('Give one correct step', () => {
     const game = new Game();
 
-    expect(game.takeStep(new Step('green'))).toEqual({result: 'win'});
+    expect(game.giveStep(new Step('green'))).toEqual('win');
+  });
+
+  test('Give two correct steps', () => {
+    const game = new Game();
+
+    game.giveStep(new Step('green'));
+    expect(game.giveStep(new Step('green'))).toEqual('next');
   });
 
   test('Take one correct step', () => {
     const game = new Game();
 
-    expect(game.takeStep(new Step('green'))).toEqual({result: 'win'});
+    game.giveStep(new Step('green'));
+    expect(game.takeColor()).toEqual('green');
   });
 
-  // test('One round, one correct step - it is a "win"', () => {
-  //   const game = new Game();
+  test('Take first incorrect step', () => {
+    const game = new Game();
 
-  //   expect(game.clickResult).toEqual({result: 'win'});
-  // });
+    game.giveStep(new Step('blue'));
+    expect(game.takeColor()).toEqual(null);
+  });
 
-  // test('Two rounds, two correct steps - it is a "next"', () => {
-  //   const game = new Game();
+  test('Take second correct step', () => {
+    const game = new Game();
 
-  //   game.click('green');
-  //   // expect(game.clickHandler(new Step('green'))).toEqual({result: 'next'});
-  // });
-
-  // test('test test', () => {
-  //   expect(new Round([]).colors).toHaveLength(1);
-  // });
+    game.giveStep(new Step('green'));
+    game.giveStep(new Step('green'));
+    expect(game.takeColor()).toEqual('green');
+  });
 });
